@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2F6F6B">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="久坐修复">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231E4A47'/%3E%3Ccircle cx='32' cy='32' r='18' fill='none' stroke='%238FBFAE' stroke-width='5'/%3E%3Cpath d='M24 33l6 6 11-12' fill='none' stroke='%23fff' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<title>12 周 · 久坐修复</title>
+<style>
+  :root{
+    --teal:#2F6F6B; --teal-d:#1E4A47; --teal-l:#E3EFEE;
+    --ink:#1F2A2A; --gray:#6B7B7A; --line:#D8E2E1;
+    --bg:#F4F8F7; --card:#FFFFFF; --peach:#E8A87C;
+    --red:#C0563F; --yellow:#FDF3D8; --green:#6FA88A;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font:15px/1.55 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+    padding:0 0 env(safe-area-inset-bottom);
+  }
+  .wrap{max-width:520px;margin:0 auto;padding:18px 16px 40px}
+  .bar{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px}
+  .bar h1{font-size:19px;margin:0;letter-spacing:.5px}
+  .bar .sub{font-size:12px;color:var(--gray)}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
+
+  .hero{display:flex;align-items:center;gap:18px}
+  .ringbox{position:relative;width:104px;height:104px;flex:0 0 auto}
+  .ring{width:104px;height:104px;transform:rotate(-90deg)}
+  .ring circle{fill:none;stroke-width:9;stroke-linecap:round}
+  .ring .bg{stroke:var(--teal-l)}
+  .ring .fg{stroke:var(--teal);transition:stroke-dashoffset .5s ease}
+  .ringtxt{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .ringtxt .n{font-size:23px;font-weight:700;line-height:1;color:var(--teal-d)}
+  .ringtxt .l{font-size:10px;color:var(--gray);margin-top:3px}
+  .stats{display:flex;gap:10px;flex:1}
+  .stat{flex:1;background:var(--teal-l);border-radius:11px;padding:9px 6px;text-align:center}
+  .stat .v{font-size:19px;font-weight:700;color:var(--teal-d);line-height:1.2}
+  .stat .k{font-size:10px;color:var(--gray);margin-top:2px}
+
+  .daynav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .daynav button{
+    background:var(--teal-l);border:0;color:var(--teal-d);width:30px;height:30px;
+    border-radius:9px;font-size:15px;cursor:pointer
+  }
+  .daynav button:disabled{opacity:.3;cursor:default}
+  .daynav .mid{text-align:center}
+  .daynav .mid b{display:block;font-size:15px}
+  .daynav .mid span{font-size:11px;color:var(--gray)}
+  .tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;background:var(--yellow);color:#9C4A3C;margin-top:4px}
+
+  .moves{list-style:none;margin:12px 0 0;padding:0}
+  .moves li{margin-bottom:8px}
+  .move{
+    display:flex;align-items:center;gap:11px;width:100%;text-align:left;
+    background:#FBFDFC;border:1px solid var(--line);border-radius:12px;
+    padding:11px 12px;cursor:pointer;font:inherit;color:inherit;
+    transition:background .15s,border-color .15s;
+  }
+  .move .box{
+    width:22px;height:22px;flex:0 0 auto;border-radius:7px;
+    border:2px solid #C4D2D1;display:flex;align-items:center;justify-content:center;
+    font-size:13px;color:#fff;transition:background .15s,border-color .15s
+  }
+  .move .txt{flex:1;min-width:0}
+  .move .nm{font-weight:600;display:block}
+  .move .rp{font-size:12px;color:var(--gray)}
+  .move[aria-pressed="true"]{background:var(--teal-l);border-color:var(--teal)}
+  .move[aria-pressed="true"] .box{background:var(--teal);border-color:var(--teal)}
+  .move[aria-pressed="true"] .nm{color:var(--teal-d)}
+
+  .btn{
+    display:block;width:100%;border:0;border-radius:12px;padding:13px;
+    font:inherit;font-weight:600;cursor:pointer;background:var(--teal);color:#fff
+  }
+  .btn.ghost{background:var(--teal-l);color:var(--teal-d)}
+  .btn.small{padding:10px;font-size:13px}
+  .row2{display:flex;gap:9px;margin-top:12px}
+
+  h2{font-size:13px;margin:0 0 12px;color:var(--gray);font-weight:600;letter-spacing:.5px}
+  .pain{margin-bottom:14px}
+  .pain:last-child{margin-bottom:0}
+  .pain .top{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px}
+  .pain .top b{color:var(--teal-d)}
+  input[type=range]{
+    -webkit-appearance:none;width:100%;height:26px;background:transparent;margin:0
+  }
+  input[type=range]::-webkit-slider-runnable-track{
+    height:6px;border-radius:3px;
+    background:linear-gradient(90deg,var(--green) 0%,#D9C68A 45%,var(--red) 100%)
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;width:22px;height:22px;border-radius:50%;
+    background:#fff;border:2px solid var(--teal);margin-top:-8px;cursor:pointer
+  }
+  input[type=range]::-moz-range-track{
+    height:6px;border-radius:3px;
+    background:linear-gradient(90deg,var(--green) 0%,#D9C68A 45%,var(--red) 100%)
+  }
+  input[type=range]::-moz-range-thumb{
+    width:20px;height:20px;border-radius:50%;background:#fff;border:2px solid var(--teal);cursor:pointer
+  }
+  .wrow{display:flex;align-items:center;gap:10px;margin-top:6px}
+  .wrow input[type=number]{
+    flex:1;font:inherit;padding:9px 11px;border:1px solid var(--line);
+    border-radius:10px;background:#FBFDFC;color:inherit
+  }
+  .wrow span{font-size:12px;color:var(--gray)}
+
+  .heatwrap{display:flex;gap:7px;align-items:stretch}
+  .heatlabels{
+    display:grid;grid-template-rows:repeat(7,1fr);gap:4px;
+    font-size:10px;color:var(--gray);flex:0 0 auto;line-height:1
+  }
+  .heatlabels span{display:flex;align-items:center;justify-content:center}
+  .heat{
+    display:grid;grid-template-columns:repeat(12,1fr);grid-template-rows:repeat(7,1fr);
+    grid-auto-flow:column;gap:4px;flex:1;aspect-ratio:12/7
+  }
+  .heat i{display:block;border-radius:4px;background:#EDF2F1}
+  .heat i.l1{background:#CFE3DE}
+  .heat i.l2{background:#9CC7BF}
+  .heat i.l3{background:var(--teal)}
+  .heat i.off{background:#F8FBFA;box-shadow:inset 0 0 0 1px #E9F0EE}
+  .legend{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--gray);margin-top:10px}
+  .legend i{width:11px;height:11px;border-radius:3px;display:block}
+
+  .callout{
+    background:var(--yellow);border-radius:11px;padding:11px 13px;
+    font-size:12.5px;color:#7A5230;line-height:1.6;margin-bottom:14px
+  }
+  .callout.err{background:#FBE4DF;color:#8C3928}
+
+  details{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0;margin-bottom:12px}
+  details>summary{
+    padding:14px 16px;cursor:pointer;font-size:13.5px;font-weight:600;
+    color:var(--teal-d);list-style:none
+  }
+  details>summary::-webkit-details-marker{display:none}
+  details>summary::after{content:"▾";float:right;color:var(--gray)}
+  details[open]>summary::after{content:"▴"}
+  details .body{padding:0 16px 16px;font-size:13px;color:#3A4A49;line-height:1.75}
+  details .body p{margin:0 0 9px}
+  details .body code{background:var(--teal-l);padding:1px 5px;border-radius:4px;font-size:12px}
+  .kv{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--line)}
+  .kv:last-child{border-bottom:0}
+  .kv span{color:var(--gray);font-size:12.5px}
+
+  /* 计时器 */
+  #timer{
+    position:fixed;inset:0;background:var(--teal-d);color:#fff;z-index:50;
+    display:none;flex-direction:column;align-items:center;justify-content:center;
+    padding:28px 24px;text-align:center
+  }
+  #timer.on{display:flex}
+  body.timer-on{overflow:hidden}
+  #timer .phase{font-size:12px;letter-spacing:2px;opacity:.75}
+  #timer .name{font-size:25px;font-weight:700;margin:14px 0 6px}
+  #timer .desc{font-size:13px;opacity:.8;max-width:300px;line-height:1.6}
+  #timer .big{font-size:76px;font-weight:200;line-height:1;margin:22px 0;font-variant-numeric:tabular-nums}
+  #timer .ctrl{display:flex;gap:12px;margin-top:8px}
+  #timer .ctrl button{
+    background:rgba(255,255,255,.15);border:0;color:#fff;border-radius:11px;
+    padding:12px 22px;font:inherit;cursor:pointer
+  }
+  #timer .ctrl button.primary{background:var(--peach);color:#5A2E12;font-weight:600}
+  .done-txt{font-size:15px;opacity:.9}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="bar">
+    <h1>12 周 · 久坐修复</h1>
+    <div class="sub" id="todayLabel"></div>
+  </div>
+
+  <div id="banner"></div>
+
+  <div class="card">
+    <div class="hero">
+      <div class="ringbox">
+        <svg class="ring" viewBox="0 0 120 120">
+          <circle class="bg" cx="60" cy="60" r="52"></circle>
+          <circle class="fg" cx="60" cy="60" r="52" id="ringFg"></circle>
+        </svg>
+        <div class="ringtxt"><div class="n" id="weekNum">0/7</div><div class="l">本周</div></div>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="v" id="stStreak">0</div><div class="k">连续天数</div></div>
+        <div class="stat"><div class="v" id="stRate">0%</div><div class="k">12 周坚持率</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="daynav">
+      <button id="prevDay" aria-label="前一天">‹</button>
+      <div class="mid">
+        <b id="viewDate"></b>
+        <span id="viewWk"></span>
+      </div>
+      <button id="nextDay" aria-label="后一天">›</button>
+    </div>
+
+    <ul class="moves" id="moveList"></ul>
+
+    <div class="row2">
+      <button class="btn" id="startTimer">开始课间 2 分钟</button>
+    </div>
+    <div class="row2">
+      <button class="btn ghost small" id="checkAll">全部打卡</button>
+      <button class="btn ghost small" id="clearDay">清空当天</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>身体状态 · 0 到 10 分</h2>
+    <div class="pain">
+      <div class="top"><span>腰疼</span><b id="backVal">未记录</b></div>
+      <input type="range" id="backRange" min="0" max="10" step="1" value="0">
+    </div>
+    <div class="pain">
+      <div class="top"><span>肩颈疼</span><b id="neckVal">未记录</b></div>
+      <input type="range" id="neckRange" min="0" max="10" step="1" value="0">
+    </div>
+    <div class="pain" style="margin-top:16px">
+      <div class="top"><span>体重</span></div>
+      <div class="wrow">
+        <input type="number" id="weightInput" step="0.1" min="30" max="120" placeholder="50.0">
+        <span>kg</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>最近 12 周</h2>
+    <div class="heatwrap">
+      <div class="heatlabels"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>
+      <div class="heat" id="heat"></div>
+    </div>
+    <div class="legend">
+      <i style="background:#EDF2F1"></i>无记录
+      <i style="background:#CFE3DE;margin-left:8px"></i>1–2 个
+      <i style="background:#9CC7BF;margin-left:8px"></i>3–4 个
+      <i style="background:var(--teal);margin-left:8px"></i>5 个以上
+    </div>
+  </div>
+
+  <details>
+    <summary>我的数据存在哪里？</summary>
+    <div class="body">
+      <p>存在**这个浏览器的本地存储**里，键名 <code>fit12w.v1</code>。不联网，不经过任何服务器，也不会有第二个人看到。</p>
+      <p>这带来三个你得知道的事实：</p>
+      <p>① 换浏览器、换设备、换手机都看不到，因为数据只在这台机器上。</p>
+      <p>② 浏览器里「清除缓存 / 清除网站数据」会把它一起清掉，无法恢复。</p>
+      <p>③ 用 <code>file://</code> 双击打开时，浏览器按文件路径区分数据。**把文件挪位置或改名，可能就读不到旧数据了**，所以要固定放在同一个路径。</p>
+      <p>因此建议：每隔一两周点一次「导出备份」，拿到一个 JSON 文件。出任何事，用「导入备份」就能还原。</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>数据管理</summary>
+    <div class="body">
+      <div class="kv"><span>本地记录的天数</span><b id="cntDays">0</b></div>
+      <div class="kv"><span>上次导出备份</span><b id="cntExport">从未</b></div>
+      <div class="row2">
+        <button class="btn ghost small" id="exportJson">导出 JSON 备份</button>
+        <button class="btn ghost small" id="exportCsv">导出 CSV</button>
+      </div>
+      <div class="row2">
+        <button class="btn ghost small" id="importBtn">导入备份</button>
+        <button class="btn ghost small" id="wipeBtn">清空全部数据</button>
+      </div>
+      <input type="file" id="importFile" accept=".json,application/json" hidden>
+    </div>
+  </details>
+</div>
+
+<div id="timer">
+  <div class="phase" id="tPhase">准备</div>
+  <div class="name" id="tName"></div>
+  <div class="desc" id="tDesc"></div>
+  <div class="big" id="tCount">3</div>
+  <div class="ctrl">
+    <button id="tStop">结束</button>
+    <button class="primary" id="tSkip">跳过这个</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  // ---- 配置 ----
+  const STORAGE_KEY = 'fit12w.v1';
+  const WEEK_TARGET = 7;
+  const TOTAL_DAYS = 84;
+  const HEAT_WEEKS = 12;
+  const WORK_SEC = 40;
+  const REST_SEC = 10;
+  const BACKUP_DAYS = 14;
+
+  const ACTIONS = {
+    c11:{n:'肩胛后缩', r:'15 次 · 停 5 秒', d:'肩胛骨向后向下夹，像后背夹住一支笔。别耸肩。'},
+    c12:{n:'收下巴',   r:'15 次 · 停 5 秒', d:'下巴水平往后收，做出双下巴的样子。不要低头。'},
+    c07:{n:'坐姿臀肌收缩', r:'10 秒 × 10', d:'夹紧臀部，不是夹腿。缓解腰痛最直接的动作。'},
+    c06:{n:'脚踝泵',   r:'20 次', d:'勾脚尖 5 秒，绷脚尖 5 秒。防久坐水肿。'},
+    c09:{n:'坐姿猫牛', r:'10 次', d:'含胸弓背 → 挺胸塌腰，跟着呼吸走。'},
+    c01:{n:'坐姿提踵', r:'20 次 × 3', d:'前脚掌踩地，脚跟抬到最高停 1 秒再慢落。'},
+    c02:{n:'坐姿直腿抬高', r:'10 次/侧', d:'单腿伸直抬到与地面平行，绷脚尖停 5 秒。'},
+    c13:{n:'坐姿胸椎伸展', r:'10 次', d:'双手抱后脑，手肘打开，上背靠椅背向后伸。'},
+    c10:{n:'坐姿收腹呼吸', r:'10 次', d:'吸气鼓腹，呼气把肚脐收向椅背，停 5 秒。'},
+    c08:{n:'坐姿骨盆前后倾', r:'10 次', d:'挺腰 → 含胸，缓慢交替，幅度小一点。'},
+    c05:{n:'坐姿单腿画圈', r:'10 圈/侧', d:'脚尖离地，小腿伸直，顺逆各 10 圈。'},
+    c03:{n:'坐姿膝内收', r:'10 秒 × 5', d:'双膝夹住拳头或书，用力挤 10 秒再放松。'},
+    c04:{n:'坐姿膝外展', r:'10 秒 × 5', d:'双手放膝外侧，膝盖向外顶、手向内推。'},
+    c14:{n:'坐姿颈侧屈', r:'20 秒/侧', d:'耳朵靠向肩膀，对侧手轻轻搭着，别用力掰。'},
+    s01:{n:'臀桥',     r:'15 次 × 3', d:'肩髋膝一条线，顶点夹臀 2 秒，别用腰顶起来。'},
+    s03:{n:'鸟狗式',   r:'10 次/侧 × 3', d:'四点支撑，对侧手脚同时伸直，慢到能控制。'},
+    s04:{n:'死虫式',   r:'10 次/侧 × 3', d:'仰卧，腰全程贴地，对侧手脚缓慢下放。'},
+    s06:{n:'靠墙静蹲', r:'30 秒 × 3', d:'背贴墙，膝盖约 90 度，不超过脚尖。'},
+    s08:{n:'平板支撑', r:'30 秒 × 3', d:'头肩髋踝一条线，夹臀收腹，别翘臀也别塌腰。'},
+    s11:{n:'婴儿式',   r:'30 秒', d:'跪坐，双手前伸，额头贴地，深呼吸把后背撑开。'},
+    s10:{n:'4 字拉伸', r:'30 秒/侧', d:'仰卧，一脚踝搭在另一腿膝上，抱大腿往胸口拉。'},
+    o01:{n:'快走',     r:'30 分钟', d:'能说话但不能唱歌的强度，心率大约 110–130。'}
+  };
+
+  // 0=周日 … 6=周六。周四(4) 是唯一能完整训练的日子。
+  const DAY_PLAN = {
+    0:{label:'恢复日 · 户外',  ids:['o01','s11','s10','c13']},
+    1:{label:'教室微运动',     ids:['c11','c12','c07','c06','c09']},
+    2:{label:'教室微运动',     ids:['c01','c02','c13','c10','c08']},
+    3:{label:'教室微运动',     ids:['c11','c12','c07','c05','c03']},
+    4:{label:'短时训练 · 重点日', ids:['s01','s03','s04','s06','s08','s11']},
+    5:{label:'教室微运动',     ids:['c06','c02','c14','c07','c04']},
+    6:{label:'教室微运动',     ids:['c11','c12','c01','c09','s10']}
+  };
+
+  const WEEK_CN = ['周日','周一','周二','周三','周四','周五','周六'];
+
+  // ---- 工具 ----
+  const pad = n => String(n).padStart(2, '0');
+  const dkey = d => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  const parseKey = k => {
+    const p = k.split('-').map(Number);
+    return new Date(p[0], p[1] - 1, p[2]);
+  };
+  const addDays = (d, n) => {
+    const x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    x.setDate(x.getDate() + n);
+    return x;
+  };
+  const weekStart = d => addDays(d, -((d.getDay() + 6) % 7));
+  const diffDays = (a, b) => Math.round((b - a) / 86400000);
+
+  const $ = id => document.getElementById(id);
+
+  function banner(msg, isErr){
+    const el = $('banner');
+    if(!msg){ el.innerHTML = ''; return; }
+    const div = document.createElement('div');
+    div.className = 'callout' + (isErr ? ' err' : '');
+    div.textContent = msg;
+    el.innerHTML = '';
+    el.appendChild(div);
+  }
+
+  // ---- 状态 ----
+  function blankDay(){
+    return { done: [], back: null, neck: null, weight: null };
+  }
+
+  function defaultState(){
+    // 新用户（和自己清空后）从今天开始算 12 周，而不是别人安装的那天
+    return { start: dkey(new Date()), days: {}, lastExport: null };
+  }
+
+  function loadState(){
+    let raw;
+    try {
+      raw = localStorage.getItem(STORAGE_KEY);
+    } catch (e) {
+      banner('浏览器禁止了本地存储，这次的打卡不会被保存。检查是否处于无痕模式。', true);
+      return defaultState();
+    }
+    if(!raw) return defaultState();
+    let s;
+    try {
+      s = JSON.parse(raw);
+    } catch (e) {
+      console.error('本地数据解析失败', e);
+      banner('本地数据损坏，无法读取。已从空白开始，建议先点「导出 JSON」把损坏的原文留一份。', true);
+      return defaultState();
+    }
+    if(!s || typeof s !== 'object' || typeof s.days !== 'object' || s.days === null){
+      banner('本地数据格式不认识，已从空白开始。', true);
+      return defaultState();
+    }
+    return {
+      start: typeof s.start === 'string' ? s.start : dkey(new Date()),
+      days: s.days,
+      lastExport: typeof s.lastExport === 'string' ? s.lastExport : null
+    };
+  }
+
+  function saveState(){
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      return true;
+    } catch (e) {
+      console.error('写入本地存储失败', e);
+      banner('保存失败：浏览器存储已满或被禁用。请立刻点「导出 JSON 备份」。', true);
+      return false;
+    }
+  }
+
+  let state = loadState();
+  let viewDate = new Date();
+  viewDate = new Date(viewDate.getFullYear(), viewDate.getMonth(), viewDate.getDate());
+
+  // 起始日会随「导入备份 / 清空数据」变化，所以不能只算一次
+  let startDate = parseKey(state.start);
+  function refreshStart(){ startDate = parseKey(state.start); }
+  const today = new Date();
+  const todayMid = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+  function dayRecord(k){
+    if(!state.days[k]) state.days[k] = blankDay();
+    const d = state.days[k];
+    if(!Array.isArray(d.done)) d.done = [];
+    return d;
+  }
+
+  function hasDone(k){
+    const d = state.days[k];
+    return !!(d && Array.isArray(d.done) && d.done.length > 0);
+  }
+
+  // ---- 统计 ----
+  function streak(){
+    let n = 0;
+    let d = new Date(todayMid);
+    for(let i = 0; i < 400; i++){
+      const k = dkey(d);
+      if(hasDone(k)){
+        n++;
+      } else if(i === 0){
+        // 今天还没打卡不算断，从昨天继续数
+      } else {
+        break;
+      }
+      d = addDays(d, -1);
+    }
+    return n;
+  }
+
+  function weekCount(){
+    const ws = weekStart(todayMid);
+    let n = 0;
+    for(let i = 0; i < 7; i++){
+      const d = addDays(ws, i);
+      if(d > todayMid) break;
+      if(hasDone(dkey(d))) n++;
+    }
+    return n;
+  }
+
+  function rate(){
+    const total = Math.min(diffDays(startDate, todayMid) + 1, TOTAL_DAYS);
+    if(total <= 0) return 0;
+    let n = 0;
+    for(let i = 0; i < total; i++){
+      if(hasDone(dkey(addDays(startDate, i)))) n++;
+    }
+    return Math.round(n / total * 100);
+  }
+
+  // ---- 渲染 ----
+  const ringLen = 2 * Math.PI * 52;
+
+  function renderHeader(){
+    const now = new Date();
+    $('todayLabel').textContent = now.getFullYear() + '/' + pad(now.getMonth() + 1) + '/' + pad(now.getDate());
+  }
+
+  function renderStats(){
+    const w = weekCount();
+    $('weekNum').textContent = w + '/' + WEEK_TARGET;
+    const r = $('ringFg');
+    r.style.strokeDasharray = ringLen;
+    r.style.strokeDashoffset = ringLen * (1 - Math.min(w / WEEK_TARGET, 1));
+    $('stStreak').textContent = streak();
+    $('stRate').textContent = rate() + '%';
+  }
+
+  function renderDay(){
+    const k = dkey(viewDate);
+    const plan = DAY_PLAN[viewDate.getDay()];
+    const rec = dayRecord(k);
+
+    $('viewDate').textContent = WEEK_CN[viewDate.getDay()] + ' ' + (viewDate.getMonth() + 1) + '月' + viewDate.getDate() + '日';
+    // 带上第几天，这样第 1 天两个箭头都禁用时不会被误认为坏了
+    const dayIdx = diffDays(startDate, viewDate) + 1;
+    $('viewWk').textContent = plan.label + ' · 第 ' + dayIdx + ' / ' + TOTAL_DAYS + ' 天';
+
+    const isToday = dkey(todayMid) === k;
+    $('nextDay').disabled = viewDate >= todayMid;
+    // diffDays 返回 b-a，所以「已在起始日」要写成 start → view 的方向
+    $('prevDay').disabled = diffDays(startDate, viewDate) <= 0;
+
+    const list = $('moveList');
+    list.innerHTML = '';
+    plan.ids.forEach(id => {
+      const a = ACTIONS[id];
+      if(!a) return;
+      const li = document.createElement('li');
+      const btn = document.createElement('button');
+      const on = rec.done.indexOf(id) !== -1;
+      btn.className = 'move';
+      btn.type = 'button';
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      btn.innerHTML =
+        '<span class="box">' + (on ? '✓' : '') + '</span>' +
+        '<span class="txt"><span class="nm"></span><span class="rp"></span></span>';
+      btn.querySelector('.nm').textContent = a.n;
+      btn.querySelector('.rp').textContent = a.r;
+      btn.addEventListener('click', () => toggleMove(id));
+      li.appendChild(btn);
+      list.appendChild(li);
+    });
+
+    $('backRange').value = rec.back === null ? 0 : rec.back;
+    $('neckRange').value = rec.neck === null ? 0 : rec.neck;
+    $('backVal').textContent = rec.back === null ? '未记录' : rec.back + ' 分';
+    $('neckVal').textContent = rec.neck === null ? '未记录' : rec.neck + ' 分';
+    $('weightInput').value = rec.weight === null ? '' : rec.weight;
+
+    renderBanner(rec, isToday);
+  }
+
+  // 优先级：疼痛警告 > 漏打提示 > 备份提醒，高的上去了低的不再抢占
+  function renderBanner(rec, isToday){
+    if(rec.back !== null && rec.back >= 6){
+      banner('腰疼已经到 ' + rec.back + ' 分，今天只做拉伸，不要加力量动作。', true);
+      return;
+    }
+    if(!isToday && !hasDone(dkey(viewDate))){
+      banner('这天没有打卡记录，可以补记，但别为了凑数据硬填。', false);
+      return;
+    }
+    if(!state.lastExport){
+      banner('还没有备份过。点最下面的「导出 JSON 备份」存一份，数据就丢不了。', false);
+      return;
+    }
+    const gap = diffDays(new Date(state.lastExport), new Date());
+    if(gap > BACKUP_DAYS){
+      banner('已经 ' + gap + ' 天没备份了。浏览器清缓存会删掉所有记录。', false);
+      return;
+    }
+    banner('');
+  }
+
+  function renderHeat(){
+    const el = $('heat');
+    el.innerHTML = '';
+    const first = addDays(weekStart(todayMid), -(HEAT_WEEKS - 1) * 7);
+    for(let i = 0; i < HEAT_WEEKS * 7; i++){
+      const d = addDays(first, i);
+      const cell = document.createElement('i');
+      const k = dkey(d);
+      if(d < startDate || d > todayMid){
+        cell.className = 'off';
+      } else {
+        const n = hasDone(k) ? (state.days[k].done || []).length : 0;
+        cell.className = n === 0 ? '' : (n <= 2 ? 'l1' : (n <= 4 ? 'l2' : 'l3'));
+        cell.title = k + ' · ' + n + ' 个动作';
+      }
+      el.appendChild(cell);
+    }
+  }
+
+  function renderCounts(){
+    $('cntDays').textContent = Object.keys(state.days).filter(k => hasDone(k)).length;
+    $('cntExport').textContent = state.lastExport
+      ? dkey(new Date(state.lastExport))
+      : '从未';
+  }
+
+  function renderAll(){
+    renderHeader();
+    renderStats();
+    renderDay();
+    renderHeat();
+    renderCounts();
+  }
+
+  // ---- 交互 ----
+  function toggleMove(id){
+    const k = dkey(viewDate);
+    const rec = dayRecord(k);
+    const i = rec.done.indexOf(id);
+    if(i === -1) rec.done.push(id);
+    else rec.done.splice(i, 1);
+    saveState();
+    renderAll();
+  }
+
+  function setPain(which, val){
+    const rec = dayRecord(dkey(viewDate));
+    rec[which] = val;
+    saveState();
+    $('backVal').textContent = rec.back === null ? '未记录' : rec.back + ' 分';
+    $('neckVal').textContent = rec.neck === null ? '未记录' : rec.neck + ' 分';
+    renderStats();
+    renderHeat();
+  }
+
+  $('backRange').addEventListener('input', e => setPain('back', Number(e.target.value)));
+  $('neckRange').addEventListener('input', e => setPain('neck', Number(e.target.value)));
+
+  $('weightInput').addEventListener('change', e => {
+    const v = e.target.value.trim();
+    const rec = dayRecord(dkey(viewDate));
+    if(v === ''){
+      rec.weight = null;
+    } else {
+      const n = Number(v);
+      if(!isFinite(n) || n < 30 || n > 120){
+        alert('体重请在 30 到 120 之间');
+        e.target.value = rec.weight === null ? '' : rec.weight;
+        return;
+      }
+      rec.weight = Math.round(n * 10) / 10;
+    }
+    saveState();
+  });
+
+  $('prevDay').addEventListener('click', () => {
+    viewDate = addDays(viewDate, -1);
+    renderAll();
+  });
+  $('nextDay').addEventListener('click', () => {
+    viewDate = addDays(viewDate, 1);
+    renderAll();
+  });
+
+  $('checkAll').addEventListener('click', () => {
+    const rec = dayRecord(dkey(viewDate));
+    const plan = DAY_PLAN[viewDate.getDay()];
+    rec.done = plan.ids.slice();
+    saveState();
+    renderAll();
+  });
+
+  $('clearDay').addEventListener('click', () => {
+    const k = dkey(viewDate);
+    if(!state.days[k]) return;
+    if(!confirm('清空这一天的打卡和身体数据？')) return;
+    delete state.days[k];
+    saveState();
+    renderAll();
+  });
+
+  // ---- 计时器 ----
+  let timerIds = [];
+  let timerIdx = 0;
+  let timerLeft = 0;
+  let timerPhase = 'work';
+  let timerHandle = null;
+  let audioCtx = null;
+
+  function beep(times){
+    if(!audioCtx) return;
+    for(let i = 0; i < times; i++){
+      const t = audioCtx.currentTime + i * 0.24;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = 880;
+      gain.gain.setValueAtTime(0.0001, t);
+      gain.gain.exponentialRampToValueAtTime(0.25, t + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.2);
+      osc.connect(gain).connect(audioCtx.destination);
+      osc.start(t);
+      osc.stop(t + 0.22);
+    }
+  }
+
+  function vibrate(pattern){
+    if(navigator.vibrate) navigator.vibrate(pattern);
+  }
+
+  function showTimerPhase(){
+    const a = ACTIONS[timerIds[timerIdx]];
+    $('tPhase').textContent = timerPhase === 'work' ? '做这个' : '休息';
+    $('tName').textContent = timerPhase === 'work' ? a.n : '放松';
+    $('tDesc').textContent = timerPhase === 'work' ? a.d : '深呼吸，准备下一个';
+    $('tCount').textContent = timerLeft;
+  }
+
+  function tick(){
+    timerLeft--;
+    if(timerLeft > 0){
+      $('tCount').textContent = timerLeft;
+      return;
+    }
+    if(timerPhase === 'work'){
+      timerPhase = 'rest';
+      timerLeft = REST_SEC;
+      beep(1);
+      vibrate(120);
+      showTimerPhase();
+      return;
+    }
+    timerIdx++;
+    if(timerIdx >= timerIds.length){
+      finishTimer();
+      return;
+    }
+    timerPhase = 'work';
+    timerLeft = WORK_SEC;
+    beep(2);
+    vibrate([120, 80, 120]);
+    showTimerPhase();
+  }
+
+  function stopTimer(){
+    if(timerHandle){ clearInterval(timerHandle); timerHandle = null; }
+    $('timer').classList.remove('on');
+    document.body.classList.remove('timer-on');
+  }
+
+  function finishTimer(){
+    stopTimer();
+    const k = dkey(viewDate);
+    const rec = dayRecord(k);
+    timerIds.forEach(id => {
+      if(rec.done.indexOf(id) === -1) rec.done.push(id);
+    });
+    saveState();
+    renderAll();
+    alert('2 分钟完成，这 3 个动作已经帮你打上卡了。');
+  }
+
+  $('startTimer').addEventListener('click', () => {
+    const plan = DAY_PLAN[viewDate.getDay()];
+    timerIds = plan.ids.slice(0, 3);
+    timerIdx = 0;
+    timerPhase = 'work';
+    timerLeft = 3;
+    $('timer').classList.add('on');
+    document.body.classList.add('timer-on');
+    $('tPhase').textContent = '准备';
+    $('tName').textContent = '马上开始';
+    $('tDesc').textContent = '三个动作，各 40 秒，中间休息 10 秒。做完自动打卡。';
+    $('tCount').textContent = '3';
+
+    if(!audioCtx){
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if(AC) audioCtx = new AC();
+    }
+    if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+
+    if(timerHandle) clearInterval(timerHandle);
+    timerHandle = setInterval(() => {
+      timerLeft--;
+      if(timerLeft > 0){ $('tCount').textContent = timerLeft; return; }
+      clearInterval(timerHandle);
+      timerHandle = setInterval(tick, 1000);
+      timerLeft = WORK_SEC;
+      beep(2);
+      vibrate([120, 80, 120]);
+      showTimerPhase();
+    }, 1000);
+  });
+
+  $('tStop').addEventListener('click', stopTimer);
+  $('tSkip').addEventListener('click', () => {
+    if(timerPhase === 'work'){
+      timerPhase = 'rest';
+      timerLeft = REST_SEC;
+    } else {
+      timerIdx++;
+      if(timerIdx >= timerIds.length){ finishTimer(); return; }
+      timerPhase = 'work';
+      timerLeft = WORK_SEC;
+    }
+    showTimerPhase();
+  });
+
+  // ---- 数据管理 ----
+  function download(blob, name){
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+  }
+
+  $('exportJson').addEventListener('click', () => {
+    state.lastExport = new Date().toISOString();
+    saveState();
+    const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+    download(blob, '健身打卡备份-' + dkey(new Date()) + '.json');
+    renderCounts();
+    banner('已导出。把这个文件放到网盘或发给自己，就算换了设备也能还原。', false);
+  });
+
+  $('exportCsv').addEventListener('click', () => {
+    const keys = Object.keys(state.days).sort();
+    const lines = ['日期,星期,完成动作数,动作,腰疼,肩颈疼,体重kg'];
+    keys.forEach(k => {
+      const d = state.days[k];
+      const done = Array.isArray(d.done) ? d.done : [];
+      if(done.length === 0 && d.back === null && d.neck === null && d.weight === null) return;
+      const names = done.map(id => (ACTIONS[id] ? ACTIONS[id].n : id)).join(' / ');
+      const dt = parseKey(k);
+      lines.push([
+        k,
+        WEEK_CN[dt.getDay()],
+        done.length,
+        '"' + names.replace(/"/g, '""') + '"',
+        d.back === null ? '' : d.back,
+        d.neck === null ? '' : d.neck,
+        d.weight === null ? '' : d.weight
+      ].join(','));
+    });
+    const blob = new Blob(['\ufeff' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+    download(blob, '健身打卡-' + dkey(new Date()) + '.csv');
+  });
+
+  $('importBtn').addEventListener('click', () => $('importFile').click());
+
+  $('importFile').addEventListener('change', e => {
+    const file = e.target.files && e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      let parsed;
+      try {
+        parsed = JSON.parse(String(reader.result));
+      } catch (err) {
+        console.error('备份文件解析失败', err);
+        alert('这个文件不是有效的备份文件，解析失败了。');
+        return;
+      }
+      if(!parsed || typeof parsed.days !== 'object' || parsed.days === null){
+        alert('文件内容不像本应用的备份，没有导入。');
+        return;
+      }
+      const n = Object.keys(parsed.days).length;
+      if(!confirm('导入会替换当前全部数据（当前有 ' + Object.keys(state.days).length + ' 天记录）。备份里有 ' + n + ' 天。继续？')) return;
+      state = {
+        start: typeof parsed.start === 'string' ? parsed.start : dkey(new Date()),
+        days: parsed.days,
+        lastExport: state.lastExport
+      };
+      saveState();
+      refreshStart();
+      viewDate = new Date(todayMid);
+      renderAll();
+      banner('导入完成，共 ' + n + ' 天记录。', false);
+    };
+    reader.onerror = () => {
+      console.error('读取文件失败', reader.error);
+      alert('读取这个文件失败了，可能没有权限。');
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  });
+
+  $('wipeBtn').addEventListener('click', () => {
+    if(!confirm('会删掉全部打卡和身体数据，且无法恢复。确定？')) return;
+    if(!confirm('真的确定？建议先导出 JSON 备份。')) return;
+    state = defaultState();
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch (err) {
+      console.error('清除本地存储失败', err);
+    }
+    refreshStart();
+    viewDate = new Date(todayMid);
+    renderAll();
+    banner('已清空。', false);
+  });
+
+  renderAll();
+})();
+</script>
+<script>
+// service worker 只在安全上下文里可用：https 或 localhost。
+// file:// 下注册会报错，所以必须挡住，否则本地双击打开每次都会抛异常。
+(function(){
+  var secure = location.protocol === 'https:' ||
+               location.hostname === 'localhost' ||
+               location.hostname === '127.0.0.1';
+  if(!secure || !('serviceWorker' in navigator)) return;
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('sw.js').catch(function(err){
+      console.error('离线缓存注册失败', err);
+    });
+  });
+})();
+</script>
+</body>
+</html>
