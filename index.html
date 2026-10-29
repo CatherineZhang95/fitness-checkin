@@ -85,6 +85,8 @@
   .btn.ghost{background:var(--teal-l);color:var(--teal-d)}
   .btn.small{padding:10px;font-size:13px}
   .row2{display:flex;gap:9px;margin-top:12px}
+  .timerrow{display:flex;gap:8px;margin-top:12px}
+  .timerrow .btn{flex:1;margin-top:0}
 
   h2{font-size:13px;margin:0 0 12px;color:var(--gray);font-weight:600;letter-spacing:.5px}
   .pain{margin-bottom:14px}
@@ -155,6 +157,46 @@
   .kv:last-child{border-bottom:0}
   .kv span{color:var(--gray);font-size:12.5px}
 
+  /* 计划编辑器 */
+  .hint{font-size:12px;color:var(--gray);margin:0 0 12px;line-height:1.6}
+  .wdchips{display:flex;gap:6px;margin-bottom:14px}
+  .wdchips button{
+    flex:1;border:1px solid var(--line);background:#FBFDFC;color:var(--ink);
+    border-radius:9px;padding:8px 0;font:inherit;font-size:13px;cursor:pointer
+  }
+  .wdchips button.on{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:600}
+  .planlabel{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+  .planlabel label{font-size:13px;color:var(--gray);flex:0 0 auto}
+  .planlabel input{
+    flex:1;min-width:0;font:inherit;font-size:13px;padding:8px 10px;
+    border:1px solid var(--line);border-radius:9px;background:#FBFDFC;color:inherit
+  }
+  .planitems{list-style:none;margin:0 0 12px;padding:0}
+  .planitems li{display:flex;align-items:center;gap:6px;margin-bottom:7px}
+  .planitems input{
+    font:inherit;font-size:13px;padding:8px 9px;border:1px solid var(--line);
+    border-radius:9px;background:#FBFDFC;color:inherit;min-width:0
+  }
+  .planitems .pi-name{flex:1.5}
+  .planitems .pi-reps{flex:1}
+  .planitems .pi-del{
+    flex:0 0 auto;width:32px;height:34px;border:1px solid var(--line);
+    background:#FBFDFC;color:var(--red);border-radius:9px;cursor:pointer;font-size:16px
+  }
+  .planempty{font-size:13px;color:var(--gray);margin:0 0 12px}
+  .addrow{display:flex;gap:8px;align-items:center}
+  .addrow select{
+    flex:1;min-width:0;font:inherit;font-size:13px;padding:9px 8px;
+    border:1px solid var(--line);border-radius:9px;background:#FBFDFC;color:inherit
+  }
+  details.sub{background:#FBFDFC;border:1px solid var(--line);border-radius:11px;margin-top:10px}
+  details.sub>summary{padding:11px 13px;font-size:13px;color:var(--ink)}
+  details.sub .subbody{padding:0 13px 13px;display:flex;flex-direction:column;gap:8px}
+  details.sub .subbody input{
+    font:inherit;font-size:13px;padding:8px 10px;border:1px solid var(--line);
+    border-radius:9px;background:#fff;color:inherit
+  }
+
   /* 计时器 */
   #timer{
     position:fixed;inset:0;background:var(--teal-d);color:#fff;z-index:50;
@@ -214,8 +256,11 @@
 
     <ul class="moves" id="moveList"></ul>
 
-    <div class="row2">
-      <button class="btn" id="startTimer">开始课间 2 分钟</button>
+    <div class="timerrow">
+      <button class="btn ghost small" data-sec="30">30 秒</button>
+      <button class="btn ghost small" data-sec="60">60 秒</button>
+      <button class="btn ghost small" data-sec="90">90 秒</button>
+      <button class="btn ghost small" id="freeTimer">自由计时</button>
     </div>
     <div class="row2">
       <button class="btn ghost small" id="checkAll">全部打卡</button>
@@ -284,16 +329,50 @@
       <input type="file" id="importFile" accept=".json,application/json" hidden>
     </div>
   </details>
+
+  <details id="planEditorBox">
+    <summary>编辑我的计划</summary>
+    <div class="body">
+      <p class="hint">改完立刻生效，只影响这台设备，朋友那边是各自独立的。打卡记录不受影响。</p>
+
+      <div class="wdchips" id="wdChips"></div>
+
+      <div class="planlabel">
+        <label for="planLabel">当天标签</label>
+        <input type="text" id="planLabel" maxlength="20" placeholder="例如 教室微运动">
+      </div>
+
+      <ul class="planitems" id="planItems"></ul>
+      <p class="planempty" id="planEmpty" style="display:none">这天还没有动作，从下面加一个。</p>
+
+      <div class="addrow">
+        <select id="libPick"></select>
+        <button class="btn ghost small" id="libAdd" style="width:auto;flex:0 0 auto;padding:9px 14px">添加</button>
+      </div>
+
+      <details class="sub">
+        <summary>新建一个自己的动作</summary>
+        <div class="subbody">
+          <input type="text" id="newName" maxlength="20" placeholder="动作名称，例如 站姿提踵">
+          <input type="text" id="newReps" maxlength="24" placeholder="次数/时长，例如 15 次 × 3">
+          <input type="text" id="newDesc" maxlength="60" placeholder="要点，计时器里会显示">
+          <button class="btn small" id="newAdd">加入这一天的列表</button>
+        </div>
+      </details>
+
+      <div class="row2">
+        <button class="btn ghost small" id="planReset">恢复默认计划</button>
+      </div>
+    </div>
+  </details>
 </div>
 
 <div id="timer">
-  <div class="phase" id="tPhase">准备</div>
-  <div class="name" id="tName"></div>
-  <div class="desc" id="tDesc"></div>
-  <div class="big" id="tCount">3</div>
+  <div class="phase" id="tPhase">倒计时</div>
+  <div class="big" id="tCount">60</div>
+  <div class="desc" id="tDesc">到点会响铃并震动</div>
   <div class="ctrl">
     <button id="tStop">结束</button>
-    <button class="primary" id="tSkip">跳过这个</button>
   </div>
 </div>
 
@@ -306,8 +385,6 @@
   const WEEK_TARGET = 7;
   const TOTAL_DAYS = 84;
   const HEAT_WEEKS = 12;
-  const WORK_SEC = 40;
-  const REST_SEC = 10;
   const BACKUP_DAYS = 14;
 
   const ACTIONS = {
@@ -348,6 +425,44 @@
 
   const WEEK_CN = ['周日','周一','周二','周三','周四','周五','周六'];
 
+  // DAY_PLAN / ACTIONS 只是出厂默认值。用户一旦改过，就以 state.plan 为准。
+  function buildDefaultDay(wd){
+    const d = DAY_PLAN[wd];
+    return {
+      label: d.label,
+      items: d.ids.map(id => Object.assign({ id: id }, ACTIONS[id]))
+    };
+  }
+
+  // 只读场景用这个：没改过就现算一份，改过就返回 state 里那份
+  function getPlan(wd){
+    const c = state.plan && state.plan[wd];
+    if(c && Array.isArray(c.items)) return c;
+    return buildDefaultDay(wd);
+  }
+
+  // 写入场景必须先调它，否则改的是 getPlan 现算出来的临时对象，存不进 state。
+  // 只固化被编辑的那一天，其他天继续跟随内置默认值。
+  function ensureDay(wd){
+    if(!state.plan || typeof state.plan !== 'object') state.plan = {};
+    const c = state.plan[wd];
+    if(!c || !Array.isArray(c.items)) state.plan[wd] = buildDefaultDay(wd);
+    return state.plan[wd];
+  }
+
+  function actionName(id){
+    if(ACTIONS[id]) return ACTIONS[id].n;
+    if(state.plan){
+      for(let wd = 0; wd < 7; wd++){
+        const p = state.plan[wd];
+        if(!p || !Array.isArray(p.items)) continue;
+        const hit = p.items.find(it => it.id === id);
+        if(hit) return hit.n;
+      }
+    }
+    return id;
+  }
+
   // ---- 工具 ----
   const pad = n => String(n).padStart(2, '0');
   const dkey = d => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
@@ -382,7 +497,7 @@
 
   function defaultState(){
     // 新用户（和自己清空后）从今天开始算 12 周，而不是别人安装的那天
-    return { start: dkey(new Date()), days: {}, lastExport: null };
+    return { start: dkey(new Date()), days: {}, lastExport: null, plan: null };
   }
 
   function loadState(){
@@ -409,7 +524,8 @@
     return {
       start: typeof s.start === 'string' ? s.start : dkey(new Date()),
       days: s.days,
-      lastExport: typeof s.lastExport === 'string' ? s.lastExport : null
+      lastExport: typeof s.lastExport === 'string' ? s.lastExport : null,
+      plan: (s.plan && typeof s.plan === 'object') ? s.plan : null
     };
   }
 
@@ -505,7 +621,7 @@
 
   function renderDay(){
     const k = dkey(viewDate);
-    const plan = DAY_PLAN[viewDate.getDay()];
+    const plan = getPlan(viewDate.getDay());
     const rec = dayRecord(k);
 
     $('viewDate').textContent = WEEK_CN[viewDate.getDay()] + ' ' + (viewDate.getMonth() + 1) + '月' + viewDate.getDate() + '日';
@@ -520,9 +636,8 @@
 
     const list = $('moveList');
     list.innerHTML = '';
-    plan.ids.forEach(id => {
-      const a = ACTIONS[id];
-      if(!a) return;
+    plan.items.forEach(item => {
+      const id = item.id;
       const li = document.createElement('li');
       const btn = document.createElement('button');
       const on = rec.done.indexOf(id) !== -1;
@@ -532,8 +647,8 @@
       btn.innerHTML =
         '<span class="box">' + (on ? '✓' : '') + '</span>' +
         '<span class="txt"><span class="nm"></span><span class="rp"></span></span>';
-      btn.querySelector('.nm').textContent = a.n;
-      btn.querySelector('.rp').textContent = a.r;
+      btn.querySelector('.nm').textContent = item.n;
+      btn.querySelector('.rp').textContent = item.r;
       btn.addEventListener('click', () => toggleMove(id));
       li.appendChild(btn);
       list.appendChild(li);
@@ -602,6 +717,7 @@
     renderDay();
     renderHeat();
     renderCounts();
+    renderEditor();
   }
 
   // ---- 交互 ----
@@ -656,8 +772,8 @@
 
   $('checkAll').addEventListener('click', () => {
     const rec = dayRecord(dkey(viewDate));
-    const plan = DAY_PLAN[viewDate.getDay()];
-    rec.done = plan.ids.slice();
+    const plan = getPlan(viewDate.getDay());
+    rec.done = plan.items.map(it => it.id);
     saveState();
     renderAll();
   });
@@ -672,10 +788,8 @@
   });
 
   // ---- 计时器 ----
-  let timerIds = [];
-  let timerIdx = 0;
   let timerLeft = 0;
-  let timerPhase = 'work';
+  let timerElapsed = 0;
   let timerHandle = null;
   let audioCtx = null;
 
@@ -700,103 +814,68 @@
     if(navigator.vibrate) navigator.vibrate(pattern);
   }
 
-  function showTimerPhase(){
-    const a = ACTIONS[timerIds[timerIdx]];
-    $('tPhase').textContent = timerPhase === 'work' ? '做这个' : '休息';
-    $('tName').textContent = timerPhase === 'work' ? a.n : '放松';
-    $('tDesc').textContent = timerPhase === 'work' ? a.d : '深呼吸，准备下一个';
-    $('tCount').textContent = timerLeft;
-  }
-
-  function tick(){
-    timerLeft--;
-    if(timerLeft > 0){
-      $('tCount').textContent = timerLeft;
-      return;
-    }
-    if(timerPhase === 'work'){
-      timerPhase = 'rest';
-      timerLeft = REST_SEC;
-      beep(1);
-      vibrate(120);
-      showTimerPhase();
-      return;
-    }
-    timerIdx++;
-    if(timerIdx >= timerIds.length){
-      finishTimer();
-      return;
-    }
-    timerPhase = 'work';
-    timerLeft = WORK_SEC;
-    beep(2);
-    vibrate([120, 80, 120]);
-    showTimerPhase();
-  }
-
   function stopTimer(){
     if(timerHandle){ clearInterval(timerHandle); timerHandle = null; }
     $('timer').classList.remove('on');
     document.body.classList.remove('timer-on');
   }
 
-  function finishTimer(){
-    stopTimer();
-    const k = dkey(viewDate);
-    const rec = dayRecord(k);
-    timerIds.forEach(id => {
-      if(rec.done.indexOf(id) === -1) rec.done.push(id);
-    });
-    saveState();
-    renderAll();
-    alert('2 分钟完成，这 3 个动作已经帮你打上卡了。');
-  }
-
-  $('startTimer').addEventListener('click', () => {
-    const plan = DAY_PLAN[viewDate.getDay()];
-    timerIds = plan.ids.slice(0, 3);
-    timerIdx = 0;
-    timerPhase = 'work';
-    timerLeft = 3;
+  // 纯计时器：不挂动作、不自动勾选。进度存在 done 里，不需要额外状态。
+  function openTimer(){
     $('timer').classList.add('on');
     document.body.classList.add('timer-on');
-    $('tPhase').textContent = '准备';
-    $('tName').textContent = '马上开始';
-    $('tDesc').textContent = '三个动作，各 40 秒，中间休息 10 秒。做完自动打卡。';
-    $('tCount').textContent = '3';
-
     if(!audioCtx){
       const AC = window.AudioContext || window.webkitAudioContext;
       if(AC) audioCtx = new AC();
     }
     if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+  }
 
-    if(timerHandle) clearInterval(timerHandle);
+  function startCountdown(sec){
+    stopTimer();
+    timerLeft = sec;
+    $('tPhase').textContent = '倒计时';
+    $('tDesc').textContent = '到点会响铃并震动';
+    $('tStop').textContent = '结束';
+    $('tCount').textContent = String(timerLeft);
+    openTimer();
     timerHandle = setInterval(() => {
       timerLeft--;
-      if(timerLeft > 0){ $('tCount').textContent = timerLeft; return; }
+      if(timerLeft > 0){
+        $('tCount').textContent = String(timerLeft);
+        return;
+      }
       clearInterval(timerHandle);
-      timerHandle = setInterval(tick, 1000);
-      timerLeft = WORK_SEC;
-      beep(2);
-      vibrate([120, 80, 120]);
-      showTimerPhase();
+      timerHandle = null;
+      $('tCount').textContent = '0';
+      $('tDesc').textContent = '完成';
+      $('tStop').textContent = '关闭';
+      beep(3);
+      vibrate([200, 100, 200, 100, 200]);
     }, 1000);
+  }
+
+  function startStopwatch(){
+    stopTimer();
+    timerElapsed = 0;
+    $('tPhase').textContent = '自由计时';
+    $('tDesc').textContent = '自己看着办，点结束就停';
+    $('tStop').textContent = '结束';
+    $('tCount').textContent = '0:00';
+    openTimer();
+    timerHandle = setInterval(() => {
+      timerElapsed++;
+      $('tCount').textContent = Math.floor(timerElapsed / 60) + ':' + pad(timerElapsed % 60);
+    }, 1000);
+  }
+
+  document.querySelectorAll('[data-sec]').forEach(b => {
+    b.addEventListener('click', () => startCountdown(Number(b.getAttribute('data-sec'))));
   });
 
+  $('freeTimer').addEventListener('click', startStopwatch);
+
   $('tStop').addEventListener('click', stopTimer);
-  $('tSkip').addEventListener('click', () => {
-    if(timerPhase === 'work'){
-      timerPhase = 'rest';
-      timerLeft = REST_SEC;
-    } else {
-      timerIdx++;
-      if(timerIdx >= timerIds.length){ finishTimer(); return; }
-      timerPhase = 'work';
-      timerLeft = WORK_SEC;
-    }
-    showTimerPhase();
-  });
 
   // ---- 数据管理 ----
   function download(blob, name){
@@ -826,7 +905,7 @@
       const d = state.days[k];
       const done = Array.isArray(d.done) ? d.done : [];
       if(done.length === 0 && d.back === null && d.neck === null && d.weight === null) return;
-      const names = done.map(id => (ACTIONS[id] ? ACTIONS[id].n : id)).join(' / ');
+      const names = done.map(id => actionName(id)).join(' / ');
       const dt = parseKey(k);
       lines.push([
         k,
@@ -895,6 +974,145 @@
     viewDate = new Date(todayMid);
     renderAll();
     banner('已清空。', false);
+  });
+
+  // ---- 计划编辑器 ----
+  let editWd = new Date().getDay();
+
+  function renderEditor(){
+    // 这里只做展示，不物化 state.plan；真正写入时才调 ensureDay
+    const chips = $('wdChips');
+    chips.innerHTML = '';
+    for(let wd = 0; wd < 7; wd++){
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = WEEK_CN[wd].replace('周', '');
+      if(wd === editWd) b.className = 'on';
+      b.addEventListener('click', () => { editWd = wd; renderEditor(); });
+      chips.appendChild(b);
+    }
+
+    const plan = getPlan(editWd);
+    $('planLabel').value = plan.label;
+
+    const ul = $('planItems');
+    ul.innerHTML = '';
+    plan.items.forEach((item, idx) => {
+      const li = document.createElement('li');
+
+      const nameIn = document.createElement('input');
+      nameIn.className = 'pi-name';
+      nameIn.value = item.n;
+      nameIn.maxLength = 20;
+      nameIn.addEventListener('change', () => {
+        const v = nameIn.value.trim();
+        if(!v){ nameIn.value = item.n; return; }
+        const t = ensureDay(editWd).items[idx];
+        if(!t) return;
+        t.n = v;
+        saveState();
+        renderAll();
+      });
+
+      const repsIn = document.createElement('input');
+      repsIn.className = 'pi-reps';
+      repsIn.value = item.r;
+      repsIn.maxLength = 24;
+      repsIn.addEventListener('change', () => {
+        const t = ensureDay(editWd).items[idx];
+        if(!t) return;
+        t.r = repsIn.value.trim();
+        saveState();
+        renderAll();
+      });
+
+      const del = document.createElement('button');
+      del.type = 'button';
+      del.className = 'pi-del';
+      del.textContent = '×';
+      del.setAttribute('aria-label', '删除 ' + item.n);
+      del.addEventListener('click', () => {
+        const day = ensureDay(editWd);
+        if(!day.items[idx]) return;
+        day.items.splice(idx, 1);
+        saveState();
+        renderAll();
+      });
+
+      li.appendChild(nameIn);
+      li.appendChild(repsIn);
+      li.appendChild(del);
+      ul.appendChild(li);
+    });
+
+    $('planEmpty').style.display = plan.items.length ? 'none' : 'block';
+
+    const sel = $('libPick');
+    sel.innerHTML = '';
+    const have = plan.items.map(it => it.id);
+    const pool = Object.keys(ACTIONS).filter(id => have.indexOf(id) === -1);
+    if(pool.length){
+      pool.forEach(id => {
+        const o = document.createElement('option');
+        o.value = id;
+        o.textContent = ACTIONS[id].n + '（' + ACTIONS[id].r + '）';
+        sel.appendChild(o);
+      });
+    } else {
+      const o = document.createElement('option');
+      o.value = '';
+      o.textContent = '动作库里的都加过了';
+      sel.appendChild(o);
+    }
+  }
+
+  $('planEditorBox').addEventListener('toggle', e => {
+    if(e.target.open){
+      editWd = viewDate.getDay();
+      renderEditor();
+    }
+  });
+
+  $('planLabel').addEventListener('change', e => {
+    const v = e.target.value.trim();
+    ensureDay(editWd).label = v || DAY_PLAN[editWd].label;
+    saveState();
+    renderAll();
+  });
+
+  $('libAdd').addEventListener('click', () => {
+    const id = $('libPick').value;
+    if(!id) return;
+    const a = ACTIONS[id];
+    ensureDay(editWd).items.push({ id: id, n: a.n, r: a.r, d: a.d });
+    saveState();
+    renderAll();
+  });
+
+  $('newAdd').addEventListener('click', () => {
+    const n = $('newName').value.trim();
+    if(!n){ alert('先给动作起个名字'); return; }
+    const reps = $('newReps').value.trim();
+    const desc = $('newDesc').value.trim();
+    ensureDay(editWd).items.push({
+      id: 'x' + Date.now().toString(36),
+      n: n,
+      r: reps || '—',
+      d: desc
+    });
+    $('newName').value = '';
+    $('newReps').value = '';
+    $('newDesc').value = '';
+    saveState();
+    renderAll();
+  });
+
+  $('planReset').addEventListener('click', () => {
+    if(!confirm('恢复成内置的默认计划？你自己加和改的动作会一起清掉，打卡记录不受影响。')) return;
+    state.plan = null;
+    saveState();
+    renderAll();
+    banner('已恢复默认计划。', false);
   });
 
   renderAll();
